@@ -9,7 +9,7 @@ class Teacher extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'order_id';
+    protected $primaryKey = 'teacher_id';
 
     protected $fillable = [
         'admin_id',
@@ -21,5 +21,10 @@ class Teacher extends Model
     public function admins()
     {
         return $this->belongsTo(Admin::class, 'admin_id');
+    }
+
+    public function DistrictDetails()
+    {
+        return $this->hasMany(District_detail::class, 'district_detail_id');
     }
 }
