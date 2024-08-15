@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('teacher_id');
             $table->timestamps();
             $table->foreign('district_id')->references('district_id')->on('districts')->onDelete('cascade');
-            $table->foreign('teacher_id')->references('teacher_id')->on('teacher')->onDelete('cascade');
+            $table->foreign('teacher_id')->references('teacher_id')->on('teachers')->onDelete('cascade');
         });
     }
 
