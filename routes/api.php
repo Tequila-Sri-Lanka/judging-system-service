@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminControllers;
+use App\Http\Controllers\DistrictControllers;
 use App\Http\Controllers\TeacherControllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,3 +25,11 @@ Route::get('/search_teacher/{input}',[TeacherControllers::class, 'searchTeacher'
 Route::get('/get_all_teacher',[TeacherControllers::class, 'getAllTeacher']);
 Route::put('/update_teacher/{id}',[TeacherControllers::class, 'updateTeacher'])->name('updateTeacher');
 Route::delete('/delete_teacher/{id}',[TeacherControllers::class, 'deleteTeacher'])->name('deleteTeacher');
+
+
+//teacher api
+Route::post('/save_district',[DistrictControllers::class, 'saveDistrict'])->name('saveDistrict');
+Route::get('/search_district/{input}',[DistrictControllers::class, 'searchDistrict'])->name('searchDistrict');
+Route::get('/get_all_district',[DistrictControllers::class, 'getAllDistrict']);
+Route::put('/update_district/{id}',[DistrictControllers::class, 'updateDistrict'])->name('updateDistrict');
+Route::delete('/delete_district/{id}',[DistrictControllers::class, 'deleteDistrict'])->name('deleteDistrict');
