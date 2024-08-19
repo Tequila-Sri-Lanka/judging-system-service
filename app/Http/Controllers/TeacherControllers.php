@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District_detail;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -46,8 +47,7 @@ class TeacherControllers extends Controller
   //get all teacher  details
   public function getAllTeacher()
   {
-    $teachers = DB::table('teachers')
-      ->get();
+    $teachers = Teacher::with(['DistrictDetails','DistrictDetails.Districts'])->get();
     return response()->json($teachers, 200);
   }
 
@@ -58,7 +58,7 @@ class TeacherControllers extends Controller
       'admin_id' => 'required|int|max:191',
       'user_name' => 'required|string|max:191',
       'password' => 'required|string|max:191',
-      'language' => 'required|string|max:191'
+      'language' => 'required|string|max:191',
     ]);
 
     if ($validator->fails()) {
@@ -73,15 +73,28 @@ class TeacherControllers extends Controller
       $teacher->user_name = $request->user_name;
       $teacher->password = bcrypt($request->password);
       $teacher->language = $request->language;
-      $result = $teacher->save();
+      $teacher->save();
+
+
+      foreach ($request->districtDetails as $value) {
+            $districtDetails = new District_detail();
+            $districtDetails->teacher_id = $teacher->teacher_id;
+            $districtDetails->district_id = $value['district_id'];
+            $teacher->DistrictDetails()->save($districtDetails);
+        
     }
-    return response()->json($result, 201);
+    }
+    return response()->json([
+      'status' => 200,
+      'message' => "Teacher saved successfully",
+      'request_data' => $request->all(),
+    ], 200);
   }
 
   //get teacher by id
   public function searchTeacher($input)
   {
-    $teachers = DB::table('teachers')
+    $teachers = Teacher::with(['DistrictDetails','DistrictDetails.Districts'])
       ->where('teacher_id', 'LIKE', '%' . $input . '%')
       ->orWhere('user_name', 'LIKE', '%' . $input . '%')
       ->orWhere('language', 'LIKE', '%' . $input . '%')
