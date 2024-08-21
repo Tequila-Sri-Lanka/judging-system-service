@@ -23,8 +23,8 @@ class StudentControllers extends Controller
   {
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required|int|max:191',
-      'medium' => 'required|string|max:191',
-      'stream' => 'required|string|max:191',
+      'medium' => 'required|string|max:190',
+      'stream' => 'required|string|max:190',
     ]);
 
     if ($validator->fails()) {
