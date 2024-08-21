@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\DistrictControllers;
 use App\Http\Controllers\DistrictDetailControllers;
+use App\Http\Controllers\StudentControllers;
 use App\Http\Controllers\TeacherControllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,3 +42,10 @@ Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 
 Route::get('/get_all_district_detail',[DistrictDetailControllers::class, 'getAllDistrictDetail']);
 Route::put('/update_district_detail/{id}',[DistrictDetailControllers::class, 'updateDistrictDetail'])->name('updateDistrictDetail');
 Route::delete('/delete_district_detail/{id}',[DistrictDetailControllers::class, 'deleteDistrictDetail'])->name('deleteDistrictDetail');
+
+//student api
+Route::post('/save_student',[StudentControllers::class, 'saveStudent'])->name('saveStudent');
+Route::get('/get_all_student',[StudentControllers::class, 'getAllStudents']);
+Route::delete('/delete_student/{id}',[StudentControllers::class, 'deleteStudent'])->name('deleteStudent');
+// Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 'searchDistrictDetail'])->name('searchDistrictDetail');
+Route::put('/update_student/{id}',[StudentControllers::class, 'updateStudent'])->name('updateStudent');

@@ -25,6 +25,7 @@ class TeacherControllers extends Controller
     $validator = Validator::make($request->all(), [
       'admin_id' => 'required|int|max:191',
       'user_name' => 'required|string|max:191',
+      'stream' => 'required|string|max:191',
       'language' => 'required|string|max:191'
     ]);
 
@@ -39,6 +40,7 @@ class TeacherControllers extends Controller
       $teacher->admin_id = $request->admin_id;
       $teacher->user_name = $request->user_name;
       $teacher->language = $request->language;
+      $teacher->stream= $request->stream;
       $result = $teacher->save();
     }
     return response()->json($result, 201);
@@ -58,6 +60,7 @@ class TeacherControllers extends Controller
       'admin_id' => 'required|int|max:191',
       'user_name' => 'required|string|max:191',
       'password' => 'required|string|max:191',
+      'stream' => 'required|string|max:191',
       'language' => 'required|string|max:191',
     ]);
 
@@ -72,6 +75,7 @@ class TeacherControllers extends Controller
       $teacher->admin_id = $request->admin_id;
       $teacher->user_name = $request->user_name;
       $teacher->password = bcrypt($request->password);
+      $teacher->stream= $request->stream;
       $teacher->language = $request->language;
       $teacher->save();
 
