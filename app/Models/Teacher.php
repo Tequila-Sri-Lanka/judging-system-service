@@ -12,6 +12,7 @@ class Teacher extends Model
     protected $primaryKey = 'teacher_id';
 
     protected $fillable = [
+        'teacher_id',
         'admin_id',
         'user_name',
         'password',
@@ -25,6 +26,6 @@ class Teacher extends Model
 
     public function DistrictDetails()
     {
-        return $this->hasMany(District_detail::class, 'district_detail_id');
+        return $this->hasMany(District_detail::class, 'teacher_id');
     }
 }

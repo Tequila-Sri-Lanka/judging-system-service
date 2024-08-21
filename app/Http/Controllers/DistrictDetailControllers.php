@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\District;
 use App\Models\District_detail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-class DistrictControllers extends Controller
+class DistrictDetailControllers extends Controller
 {
-    //delete district
-    public function deleteDistrict(int $id)
+    //delete district Details
+    public function deleteDistrictDetail(int $id)
     {
-        $district = District::find($id);
+        $district = District_detail::find($id);
         if ($district == null) {
-            return response()->json(['message' => ' District is Empty'], 500);
+            return response()->json(['message' => ' district Details is Empty'], 500);
         } else {
             $district->delete();
             return response()->json(['message' => ' District deleted successfully'], 200);
@@ -23,11 +22,12 @@ class DistrictControllers extends Controller
     }
 
 
-    //update district
-    public function updateDistrict(Request $request, $id)
+    //update district Details
+    public function updateDistrictDetail(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:191',
+        $validator = validator::make($request->all(), [
+            'district_id' => 'required|string|max:191',
+            'teacher_id' => 'required|string|max:191',
         ]);
 
         if ($validator->fails()) {
@@ -37,26 +37,28 @@ class DistrictControllers extends Controller
                 'errors' => $validator->errors(),
             ], 500);
         } else {
-            $district = District::find($id);
-            $district->name = $request->name;
+            $district = District_detail::find($id);
+            $district->district_id = $request->district_id;
+            $district->teacher_id = $request->teacher_id;
             $result = $district->save();
         }
         return response()->json($result, 201);
     }
 
-    //get all district  details
-    public function getAllDistrict()
+    //get all district details
+    public function getAllDistrictDetail()
     {
-        $districts = DB::table('districts')
+        $districts = DB::table('district_details')
             ->get();
         return response()->json($districts, 200);
     }
 
-    //save district
-    public function saveDistrict(Request $request)
+    //save district Details
+    public function saveDistrictDetail(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:191',
+           'district_id' => 'required|string|max:191',
+            'teacher_id' => 'required|string|max:191',
         ]);
 
         if ($validator->fails()) {
@@ -66,20 +68,20 @@ class DistrictControllers extends Controller
                 'errors' => $validator->errors(),
             ], 500);
         } else {
-            $district = new District();
-            $district->name = $request->name;
+            $district = new District_detail();
+            $district->district_id = $request->district_id;
+            $district->teacher_id = $request->teacher_id;
             $result = $district->save();
         }
         return response()->json($result, 201);
     }
 
-    //get district by id
-    public function searchDistrict($input)
+    //get district Details by id
+    public function searchDistrictDetail($input)
     {
         $districts = District_detail::with('teachers')
-            ->where('district_id', 'LIKE', '%' . $input . '%')
+            ->where('district_detail_id', 'LIKE', '%' . $input . '%')
             ->get();
         return response()->json($districts, 201);
-
     }
 }
