@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\DistrictControllers;
 use App\Http\Controllers\DistrictDetailControllers;
+use App\Http\Controllers\MarkControllers;
 use App\Http\Controllers\StudentControllers;
 use App\Http\Controllers\TeacherControllers;
 use Illuminate\Http\Request;
@@ -49,3 +50,10 @@ Route::get('/get_all_student',[StudentControllers::class, 'getAllStudents']);
 Route::delete('/delete_student/{id}',[StudentControllers::class, 'deleteStudent'])->name('deleteStudent');
 // Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 'searchDistrictDetail'])->name('searchDistrictDetail');
 Route::put('/update_student/{id}',[StudentControllers::class, 'updateStudent'])->name('updateStudent');
+
+//Mark api
+Route::post('/save_mark',[MarkControllers::class, 'saveMark'])->name('saveMark');
+Route::get('/get_all_mark',[MarkControllers::class, 'getAllMarks']);
+Route::delete('/delete_mark/{id}',[MarkControllers::class, 'deleteMark'])->name('deleteMark');
+// Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 'searchDistrictDetail'])->name('searchDistrictDetail');
+Route::put('/update_mark/{id}',[MarkControllers::class, 'updateMark'])->name('updateMark');

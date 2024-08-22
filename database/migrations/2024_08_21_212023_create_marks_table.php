@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('marks', function (Blueprint $table) {
             $table->increments("mark_id");
-            $table->json("competition_group");
             $table->string('mark');
             $table->double('total');
-            $table->double('average');
+            $table->double('averages');
             $table->unsignedInteger('teacher_id');
             $table->unsignedInteger('student_id');
             $table->timestamps();

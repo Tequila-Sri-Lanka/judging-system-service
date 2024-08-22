@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments("student_id");
             $table->string("setial_no");
             $table->string('medium');
+            $table->integer('age');
             $table->string('stream');
             $table->timestamps();
         });

@@ -12,10 +12,9 @@ class Marks extends Model
     protected $primaryKey = 'mark_id';
 
     protected $fillable = [
-        'competition_group',
         'mark',
         'total',
-        'average',
+        'averages',
         'teacher_id',
         'student_id',
     ];

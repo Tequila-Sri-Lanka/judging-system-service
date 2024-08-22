@@ -24,7 +24,8 @@ class StudentControllers extends Controller
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required|int|max:191',
       'medium' => 'required|string|max:190',
-      'stream' => 'required|string|max:190',
+      'age'=>'required|int|max:190',
+      'stream' => 'required|INT|max:190',
     ]);
 
     if ($validator->fails()) {
@@ -37,6 +38,7 @@ class StudentControllers extends Controller
       $student = Student::find($id);
       $student->setial_no = $request->setial_no;
       $student->medium = $request->medium;
+      $student->age = $request->age;
       $student->stream= $request->stream;
       $result = $student->save();
     }
@@ -58,6 +60,7 @@ class StudentControllers extends Controller
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required|int|max:191',
       'medium' => 'required|string|max:191',
+      'age'=>'required|int|max:190',
       'stream' => 'required|string|max:191',
     ]);
 
@@ -71,6 +74,7 @@ class StudentControllers extends Controller
       $student = new Student();
       $student->setial_no = $request->setial_no;
       $student->medium = $request->medium;
+      $student->age = $request->age;
       $student->stream= $request->stream;
       $student->save();
     }
