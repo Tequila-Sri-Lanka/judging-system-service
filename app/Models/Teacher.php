@@ -17,6 +17,7 @@ class Teacher extends Model
         'user_name',
         'password',
         'language',
+        'stream',
     ];
 
     public function admins()
@@ -27,5 +28,10 @@ class Teacher extends Model
     public function DistrictDetails()
     {
         return $this->hasMany(District_detail::class, 'teacher_id');
+    }
+
+    public function Marks()
+    {
+        return $this->hasMany(Marks::class, 'teacher_id');
     }
 }
