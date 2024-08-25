@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -17,15 +17,19 @@ class AdminControllers extends Controller
             'password' => 'required|min:4|max:12'
         ]);
 
-        $user = Admin::where('user_name', $fields['user_name'])->first();
+        $user = User::where('user_name', $fields['user_name'])->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credits'], 401);
         }
 
+        $token = $user->createToken('token')->plainTextToken;
+
         $response = [
-            'user' => $user
+            'user' => $user,
+            'token' => $token
         ];
+
         return response($response, 201);
     }
 
@@ -33,7 +37,7 @@ class AdminControllers extends Controller
     // user register
     public function register(Request $request)
     {
-        $user = new Admin;
+        $user = new User;
         $user->user_name = $request->userName;
         $user->password = bcrypt($request->password);
         $user->save();
@@ -46,7 +50,7 @@ class AdminControllers extends Controller
     //update user details
     public function userUpdate(Request $request, $id)
     {
-        $user = Admin::find($id);
+        $user = User::find($id);
         $user->user_name = $request->user_name;
         $user->password = bcrypt($request->password);
         $user->save();
@@ -71,8 +75,8 @@ class AdminControllers extends Controller
     public function userDetails()
     {
         $userId = Auth::id();
-        $usersDetails = Admin::select('admin_id', 'user_name')
-            ->where('admin_id', '=', $userId)
+        $usersDetails = User::select('id', 'user_name')
+            ->where('id', '=', $userId)
             ->get();
 
         return response()->json($usersDetails, 200);
@@ -82,7 +86,7 @@ class AdminControllers extends Controller
     //get all user details
     public function getAllUser()
     {
-        $usersDetails = Admin::select('admin_id','user_name')
+        $usersDetails = User::select('id','user_name')
             ->get();
 
         return response()->json($usersDetails, 200);
