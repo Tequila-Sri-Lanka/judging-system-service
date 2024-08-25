@@ -22,9 +22,15 @@ Route::get('/logout', [AdminControllers::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     //admin api
-    Route::get('getAllUser', [AdminControllers::class, 'getAllUser']);
+    Route::get('/getAllUser', [AdminControllers::class, 'getAllUser']);
     Route::get('/userDetails', [AdminControllers::class, 'userDetails'])->name('userDetails');
     Route::put('/userUpdate/{id}', [AdminControllers::class, 'userUpdate'])->name('userUpdate');
+
+
+    Route::post('/send_otp', [AdminControllers::class, 'sendOTP']);
+    Route::post('/verify_otp', [AdminControllers::class, 'verifyOTP']);
+    Route::post('/change_password', [AdminControllers::class, 'changePassword']);
+
 
 
     //teacher api
