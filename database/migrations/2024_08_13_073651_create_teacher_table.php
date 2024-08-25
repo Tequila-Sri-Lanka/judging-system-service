@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string("language");
             $table->string('stream');
             $table->timestamps();
-            $table->unsignedInteger('admin_id');
-            $table->foreign('admin_id')->references('admin_id')->on('admins')->onDelete('cascade');
+            $table->unsignedBigInteger('id');
+            $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
