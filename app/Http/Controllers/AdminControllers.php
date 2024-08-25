@@ -2,93 +2,161 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Otp;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Twilio\Rest\Client;
+use Illuminate\Support\Facades\Validator;
 
 class AdminControllers extends Controller
 {
-    // user login
+    // User login
     public function login(Request $request)
     {
         $fields = $request->validate([
             'user_name' => 'required',
-            'password' => 'required|min:4|max:12'
+            'password' => 'required|min:8|'
         ]);
 
         $user = User::where('user_name', $fields['user_name'])->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response(['message' => 'Bad credits'], 401);
+            return response(['message' => 'Bad credentials'], 401);
         }
 
         $token = $user->createToken('token')->plainTextToken;
-
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        return response($response, 201);
+        return response(['user' => $user, 'token' => $token], 201);
     }
 
 
-    // user register
+
+    // User registration
     public function register(Request $request)
     {
-        $user = new User;
-        $user->user_name = $request->userName;
-        $user->password = bcrypt($request->password);
-        $user->save();
-        return response()->json([
-            "message" => "Registration successful",
-        ], 201);
+        $request->validate([
+            'user_name' => 'required|unique:users,user_name',
+            'contact' => 'required|unique:users,contact',
+            'password' => 'required|min:8'
+        ]);
+
+        User::create([
+            'user_name' => $request->user_name,
+            'contact' => $request->contact,
+            'password' => bcrypt($request->password),
+        ]);
+
+
+        return response()->json(['message' => 'Registration successful'], 201);
     }
 
 
-    //update user details
+
+    // Update user details
     public function userUpdate(Request $request, $id)
     {
-        $user = User::find($id);
-        $user->user_name = $request->user_name;
-        $user->password = bcrypt($request->password);
-        $user->save();
-        return response()->json([
-            "message" => "update successful",
-        ], 201);
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'user_name' => 'sometimes|required|unique:users,user_name,' . $id,
+            'contact' => 'sometimes|required|unique:users,contact,' . $id,
+            'password' => 'sometimes|nullable|min:8',
+        ]);
+
+        $user->update([
+            'user_name' => $request->user_name,
+            'contact' => $request->contact,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+        ]);
+
+        return response()->json(['message' => 'Update successful'], 200);
     }
 
 
-    // user logout
+
+    // User logout
     public function logout()
     {
-        auth()->logout();
-        return response()->json([
-            "message" => "Logout Successful",
-        ], 201);
+        Auth::logout();
+        return response()->json(['message' => 'Logout successful'], 200);
     }
 
 
 
-    //get user details
+    // Get user details
     public function userDetails()
     {
-        $userId = Auth::id();
-        $usersDetails = User::select('id', 'user_name')
-            ->where('id', '=', $userId)
-            ->get();
-
-        return response()->json($usersDetails, 200);
+        $user = Auth::user(['id', 'user_name']);
+        return response()->json($user, 200);
     }
 
-
-    //get all user details
+    // Get all users
     public function getAllUser()
     {
-        $usersDetails = User::select('id','user_name')
-            ->get();
+        $users = User::select('id', 'user_name', 'contact')->get();
 
-        return response()->json($usersDetails, 200);
+        return response()->json($users, 200);
+    }
+
+
+    // Send OTP function
+    public function sendOTP(Request $request)
+    {
+        $request->validate(['contact' => 'required|exists:users,contact']);
+
+        $otp = rand(100000, 999999);
+        $contact = $request->contact;
+
+        Otp::create([
+            'contact' => $contact,
+            'otp' => $otp,
+            'expires_at' => now()->addMinutes(5),
+        ]);
+
+        $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+        $twilio->messages->create($contact, [
+            'from' => env('TWILIO_FROM'),
+            'body' => "Your OTP code is $otp"
+        ]);
+
+        return response()->json(['message' => 'OTP sent successfully'], 200);
+    }
+
+
+    // Verify OTP function
+    public function verifyOTP(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|numeric',
+            'contact' => 'required|exists:otps,contact',
+        ]);
+
+        $otpRecord = Otp::where('contact', $request->contact)
+            ->where('otp', $request->otp)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$otpRecord) {
+            return response()->json(['error' => 'Invalid or expired OTP'], 400);
+        }
+        $otpRecord->delete();
+        return response()->json(['message' => 'OTP verified successfully'], 200);
+    }
+
+
+    // Change password
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'contact' => 'required|exists:users,contact',
+            'password' => 'required|min:8|string',
+        ]);
+
+        $user = User::where('contact', $request->contact)->first();
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return response()->json(['message' => 'Password changed successfully'], 200);
     }
 }
+

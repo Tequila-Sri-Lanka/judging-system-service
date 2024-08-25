@@ -11,18 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('otps', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
             $table->string('contact');
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('otp');
+            $table->timestamp('expires_at');
             $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -31,7 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('otps');
     }
 };
