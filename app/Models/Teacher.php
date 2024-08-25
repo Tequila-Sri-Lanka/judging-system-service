@@ -13,7 +13,7 @@ class Teacher extends Model
 
     protected $fillable = [
         'teacher_id',
-        'admin_id',
+        'id',
         'user_name',
         'password',
         'language',
@@ -22,7 +22,7 @@ class Teacher extends Model
 
     public function admins()
     {
-        return $this->belongsTo(Admin::class, 'admin_id');
+        return $this->belongsTo(User::class, 'id');
     }
 
     public function DistrictDetails()
