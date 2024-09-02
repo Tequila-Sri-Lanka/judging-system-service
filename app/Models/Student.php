@@ -16,6 +16,8 @@ class Student extends Model
         'setial_no',
         'medium',
         'age',
+        'image',
+        'student_detail',
         'stream',
     ];
 
