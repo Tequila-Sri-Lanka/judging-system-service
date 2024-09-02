@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class StudentControllers extends Controller
 {
-    //delete student
+  //delete student
   public function deleteStudent(int $id)
   {
     $student = Student::find($id);
@@ -24,14 +24,14 @@ class StudentControllers extends Controller
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required|int|max:191',
       'medium' => 'required|string|max:190',
-      'age'=>'required|int|max:190',
+      'age' => 'required|int|max:190',
       'stream' => 'required|INT|max:190',
     ]);
 
     if ($validator->fails()) {
       return response()->json([
         'status' => 500,
-        'message' => "Something Went Wrong!",
+        'message' => "Invalied input!",
         'errors' => $validator->errors(),
       ], 500);
     } else {
@@ -39,7 +39,7 @@ class StudentControllers extends Controller
       $student->setial_no = $request->setial_no;
       $student->medium = $request->medium;
       $student->age = $request->age;
-      $student->stream= $request->stream;
+      $student->stream = $request->stream;
       $result = $student->save();
     }
     return response()->json($result, 201);
@@ -60,30 +60,36 @@ class StudentControllers extends Controller
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required|int|max:191',
       'medium' => 'required|string|max:191',
-      'age'=>'required|int|max:190',
+      'age' => 'required|int|max:190',
       'stream' => 'required|string|max:191',
     ]);
 
     if ($validator->fails()) {
       return response()->json([
         'status' => 500,
-        'message' => "Something Went Wrong!",
+        'message' => "Invalied input!",
         'errors' => $validator->errors(),
       ], 500);
     } else {
-      $student = new Student();
-      $student->setial_no = $request->setial_no;
-      $student->medium = $request->medium;
-      $student->age = $request->age;
-      $student->stream= $request->stream;
-      $student->save();
+
+      $isSave = $request->save();
+
+      //check if student save successfully or not and return appropriate response.
+      if($isSave){
+        return response()->json([
+          'status' => 200,
+          'message' => "Student saved successfully",
+          'request_data' => $request->all(),
+        ], 200);
+      }else{
+        return response()->json([
+          'status' => 200,
+          'message' => "Something Went Wrong! "+$isSave,
+          'request_data' => $request->all(),
+        ], 500);
+      }
     }
-    return response()->json([
-      'status' => 200,
-      'message' => "Teacher saved successfully",
-      'request_data' => $request->all(),
-    ], 200);
   }
 
-  
+
 }
