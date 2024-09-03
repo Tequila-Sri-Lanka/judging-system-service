@@ -98,22 +98,17 @@ class AdminControllers extends Controller
     {
         $request->validate(['contact' => 'required']);
         $contact = $request->contact;
-
-        $user = User::where('user_name', $request['user_name'] && 'contact', $request['contact'])->first();
-        if (!$user) {
-            dd($user);
-        }else{
-            dd($user);
+        $user = User::where('contact', 'LIKE', '%' . substr($contact, -9))
+            ->first();
+        if ($user) {
+            $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+            $twilio->verify->v2->services(env('SERVICE_TOKEN'))
+                ->verifications
+                ->create($contact, "sms");
+            return response()->json(['message' => 'OTP sent successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Invalied User..!'], 430);
         }
-
-        $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
-        print(env('TWILIO_SID'));
-        $verification = $twilio->verify->v2->services(env('SERVICE_TOKEN'))
-            ->verifications
-            ->create($contact, "sms");
-        print($verification->sid);
-
-        return response()->json(['message' => 'OTP sent successfully'], 200);
     }
 
 
@@ -123,15 +118,11 @@ class AdminControllers extends Controller
         $request->validate([
             'otp' => 'required|numeric',
             'contact' => 'required|exists:otps,contact',
+            'password' => 'required'
         ]);
 
-        // $otpRecord = Otp::where('contact', $request->contact)
-        //     ->where('otp', $request->otp)
-        //     ->where('expires_at', '>', now())
-        //     ->first();
-
         $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
-        $verification_check = $twilio->verify->v2->services(env('SERVICE_TOKEN'))
+        $verification = $twilio->verify->v2->services(env('SERVICE_TOKEN'))
             ->verificationChecks
             ->create(
                 [
@@ -139,36 +130,34 @@ class AdminControllers extends Controller
                     "code" => $request->otp
                 ]
             );
-        print($verification_check->sid);
 
-        // if (!$otpRecord) {
-        //     return response()->json(['error' => 'Invalid or expired OTP'], 400);
-        // }
-        // $otpRecord->delete();
-        return response()->json(['message' => 'OTP verified successfully'], 200);
-    }
-
-
-    // Change password
-    public function changePassword(Request $request)
-    {
-        $request->validate([
-            'contact' => 'required|exists:users,contact',
-            'password' => 'required|min:8|string',
-        ]);
-
-        $user = User::where('user_name', $request['user_name'])
-                ->where('contact', $request['contact'])
-                ->first();
-        if (!$user) {
-            //innavanam
-        }else{
-//nattan
+        if ($verification) {
+            $contact = $request->contact;
+            $user = User::where('contact', 'LIKE', '%' . substr($contact, -9))->first();
+            $user->update(['password' => Hash::make($request->password)]);
+            return response()->json(['message' => 'OTP verified successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Invalid OTP'], 401);
         }
-
-        $user = User::where('contact', $request->contact)->first();
-        $user->update(['password' => Hash::make($request->password)]);
-
-        return response()->json(['message' => 'Password changed successfully'], 200);
     }
+
+
+    // // Change password
+    // public function changePassword(Request $request)
+    // {
+    //     $request->validate([
+    //         'contact' => 'required|exists:users,contact',
+    //         'password' => 'required|min:8|string',
+    //     ]);
+    //     $contact = $request->contact;
+
+    //     $user = User::where('contact', 'LIKE', '%' . substr($contact, -9))
+    //         ->first();
+    //     if ($user) {
+    //         $user->update(['password' => Hash::make($request->password)]);
+    //         return response()->json(['message' => 'Password changed successfully'], 200);
+    //     } else {
+    //         return response()->json(['message' => 'Invalied User..!'], 430);
+    //     }
+    // }
 }
