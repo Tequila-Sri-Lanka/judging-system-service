@@ -56,19 +56,15 @@ Route::delete('/delete_district_detail/{id}', [DistrictDetailControllers::class,
 Route::post('/save_student', [StudentControllers::class, 'saveStudent'])->name('saveStudent');
 Route::get('/get_all_student', [StudentControllers::class, 'getAllStudents']);
 Route::delete('/delete_student/{id}', [StudentControllers::class, 'deleteStudent'])->name('deleteStudent');
-// Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 'searchDistrictDetail'])->name('searchDistrictDetail');
-Route::put('/update_student/{id}', [StudentControllers::class, 'updateStudent'])->name('updateStudent');
+Route::post('/update_student/{id}', [StudentControllers::class, 'updateStudent'])->name('updateStudent');
 
 //Mark api
 Route::post('/save_mark', [MarkControllers::class, 'saveMark'])->name('saveMark');
 Route::get('/get_all_mark', [MarkControllers::class, 'getAllMarks']);
 Route::delete('/delete_mark/{id}', [MarkControllers::class, 'deleteMark'])->name('deleteMark');
-// Route::get('/search_district_detail/{input}',[DistrictDetailControllers::class, 'searchDistrictDetail'])->name('searchDistrictDetail');
 Route::put('/update_mark/{id}', [MarkControllers::class, 'updateMark'])->name('updateMark');
 
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    
-
 });
