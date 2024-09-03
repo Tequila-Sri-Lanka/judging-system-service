@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+// require_once vender\;
 
 use App\Models\Otp;
 use App\Models\User;
@@ -17,7 +18,7 @@ class AdminControllers extends Controller
     {
         $fields = $request->validate([
             'user_name' => 'required',
-            'password' => 'required|min:8|'
+            'password' => 'required'
         ]);
 
         $user = User::where('user_name', $fields['user_name'])->first();
@@ -27,10 +28,8 @@ class AdminControllers extends Controller
         }
 
         $token = $user->createToken('token')->plainTextToken;
-        return response(['user' => $user, 'token' => $token], 201);
+        return response(['user' => $user, 'token' => $token], 200);
     }
-
-
 
     // User registration
     public function register(Request $request)
@@ -38,7 +37,7 @@ class AdminControllers extends Controller
         $request->validate([
             'user_name' => 'required|unique:users,user_name',
             'contact' => 'required|unique:users,contact',
-            'password' => 'required|min:8'
+            'password' => 'required'
         ]);
 
         User::create([
@@ -50,8 +49,6 @@ class AdminControllers extends Controller
 
         return response()->json(['message' => 'Registration successful'], 201);
     }
-
-
 
     // Update user details
     public function userUpdate(Request $request, $id)
@@ -73,16 +70,12 @@ class AdminControllers extends Controller
         return response()->json(['message' => 'Update successful'], 200);
     }
 
-
-
     // User logout
     public function logout()
     {
         Auth::logout();
         return response()->json(['message' => 'Logout successful'], 200);
     }
-
-
 
     // Get user details
     public function userDetails()
@@ -103,22 +96,22 @@ class AdminControllers extends Controller
     // Send OTP function
     public function sendOTP(Request $request)
     {
-        $request->validate(['contact' => 'required|exists:users,contact']);
-
-        $otp = rand(100000, 999999);
+        $request->validate(['contact' => 'required']);
         $contact = $request->contact;
 
-        Otp::create([
-            'contact' => $contact,
-            'otp' => $otp,
-            'expires_at' => now()->addMinutes(5),
-        ]);
+        $user = User::where('user_name', $request['user_name'] && 'contact', $request['contact'])->first();
+        if (!$user) {
+            dd($user);
+        }else{
+            dd($user);
+        }
 
         $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
-        $twilio->messages->create($contact, [
-            'from' => env('TWILIO_FROM'),
-            'body' => "Your OTP code is $otp"
-        ]);
+        print(env('TWILIO_SID'));
+        $verification = $twilio->verify->v2->services(env('SERVICE_TOKEN'))
+            ->verifications
+            ->create($contact, "sms");
+        print($verification->sid);
 
         return response()->json(['message' => 'OTP sent successfully'], 200);
     }
@@ -132,15 +125,26 @@ class AdminControllers extends Controller
             'contact' => 'required|exists:otps,contact',
         ]);
 
-        $otpRecord = Otp::where('contact', $request->contact)
-            ->where('otp', $request->otp)
-            ->where('expires_at', '>', now())
-            ->first();
+        // $otpRecord = Otp::where('contact', $request->contact)
+        //     ->where('otp', $request->otp)
+        //     ->where('expires_at', '>', now())
+        //     ->first();
 
-        if (!$otpRecord) {
-            return response()->json(['error' => 'Invalid or expired OTP'], 400);
-        }
-        $otpRecord->delete();
+        $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+        $verification_check = $twilio->verify->v2->services(env('SERVICE_TOKEN'))
+            ->verificationChecks
+            ->create(
+                [
+                    "to" => $request->contact,
+                    "code" => $request->otp
+                ]
+            );
+        print($verification_check->sid);
+
+        // if (!$otpRecord) {
+        //     return response()->json(['error' => 'Invalid or expired OTP'], 400);
+        // }
+        // $otpRecord->delete();
         return response()->json(['message' => 'OTP verified successfully'], 200);
     }
 
@@ -153,10 +157,18 @@ class AdminControllers extends Controller
             'password' => 'required|min:8|string',
         ]);
 
+        $user = User::where('user_name', $request['user_name'])
+                ->where('contact', $request['contact'])
+                ->first();
+        if (!$user) {
+            //innavanam
+        }else{
+//nattan
+        }
+
         $user = User::where('contact', $request->contact)->first();
         $user->update(['password' => Hash::make($request->password)]);
 
         return response()->json(['message' => 'Password changed successfully'], 200);
     }
 }
-
