@@ -13,11 +13,12 @@ class Teacher extends Model
 
     protected $fillable = [
         'teacher_id',
-        'id',
+        'admin_id',
         'user_name',
         'password',
         'language',
         'stream',
+        'contact',
     ];
 
     public function admins()
