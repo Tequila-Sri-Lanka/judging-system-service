@@ -36,6 +36,7 @@ Route::get('/search_teacher/{input}', [TeacherControllers::class, 'searchTeacher
 Route::get('/get_all_teacher', [TeacherControllers::class, 'getAllTeacher']);
 Route::put('/update_teacher/{id}', [TeacherControllers::class, 'updateTeacher'])->name('updateTeacher');
 Route::delete('/delete_teacher/{id}', [TeacherControllers::class, 'deleteTeacher'])->name('deleteTeacher');
+Route::post('/user-login', [TeacherControllers::class, 'login'])->name('login');
 
 
 //district api

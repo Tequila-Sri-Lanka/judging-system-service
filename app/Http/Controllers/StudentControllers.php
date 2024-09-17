@@ -77,7 +77,7 @@ class StudentControllers extends Controller
   //save student
   public function saveStudent(Request $request,)
   {
-    dd($request->all());
+    // dd($request->all());
     $validator = Validator::make($request->all(), [
       'setial_no' => 'required',
       'medium' => 'required',

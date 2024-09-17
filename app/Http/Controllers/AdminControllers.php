@@ -17,11 +17,11 @@ class AdminControllers extends Controller
     public function login(Request $request)
     {
         $fields = $request->validate([
-            'user_name' => 'required',
+            'userName' => 'required',
             'password' => 'required'
         ]);
 
-        $user = User::where('user_name', $fields['user_name'])->first();
+        $user = User::where('user_name', $fields['userName'])->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credentials'], 401);
