@@ -57,35 +57,38 @@ class TeacherControllers extends Controller
   public function saveTeacher(Request $request)
   {
     $validator = Validator::make($request->all(), [
-      'admin_id' => 'required|int|max:191',
-      'user_name' => 'required|string|max:191',
+      'adminId' => 'required|int|max:191',
+      'availableDistricts' => 'required|array|max:191',
+      'userName' => 'required|string|max:191',
+      'contact' => 'required|int',
       'password' => 'required|string|max:191',
       'stream' => 'required|string|max:191',
-      'language' => 'required|string|max:191',
     ]);
 
     if ($validator->fails()) {
       return response()->json([
-        'status' => 500,
-        'message' => "Something Went Wrong!",
+        'status' => 400,
+        'message' => "Validations faild",
         'errors' => $validator->errors(),
       ], 500);
     } else {
+        // dd($request->all());
+
       $teacher = new Teacher();
-      $teacher->admin_id = $request->admin_id;
-      $teacher->user_name = $request->user_name;
+      $teacher->admin_id = $request->adminId;
+      $teacher->user_name = $request->userName;
       $teacher->password = bcrypt($request->password);
       $teacher->stream= $request->stream;
       $teacher->language = $request->language;
+      $teacher->contact = $request->contact;
       $teacher->save();
 
-
-      foreach ($request->districtDetails as $value) {
+      foreach ($request->availableDistricts as $value) {
             $districtDetails = new District_detail();
             $districtDetails->teacher_id = $teacher->teacher_id;
-            $districtDetails->district_id = $value['district_id'];
+            $districtDetails->district_id = $value;
             $teacher->DistrictDetails()->save($districtDetails);
-        
+
     }
     }
     return response()->json([
