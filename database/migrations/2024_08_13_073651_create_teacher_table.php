@@ -17,9 +17,10 @@ return new class extends Migration
             $table->string("password");
             $table->string("language");
             $table->string('stream');
+            $table->integer('contact');
             $table->timestamps();
-            $table->unsignedBigInteger('id');
-            $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('admin_id');
+            $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

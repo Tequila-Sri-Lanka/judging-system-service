@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string("setial_no");
             $table->string('medium');
             $table->integer('age');
+            $table->string('image')->nullable();
+            $table->string('student_detail')->nullable();
             $table->string('stream');
             $table->timestamps();
         });
