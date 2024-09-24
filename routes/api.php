@@ -56,6 +56,7 @@ Route::delete('/delete_district_detail/{id}', [DistrictDetailControllers::class,
 //student api
 Route::post('/save_student', [StudentControllers::class, 'saveStudent'])->name('saveStudent');
 Route::get('/get_all_student', [StudentControllers::class, 'getAllStudents']);
+Route::get('/student/{id}', [StudentControllers::class, 'getAllStudents']);
 Route::delete('/delete_student/{id}', [StudentControllers::class, 'deleteStudent'])->name('deleteStudent');
 Route::post('/update_student/{id}', [StudentControllers::class, 'updateStudent'])->name('updateStudent');
 

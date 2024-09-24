@@ -64,8 +64,6 @@ class StudentControllers extends Controller
     ], 500);
 }
 
-
-
   //get all student  details
   public function getAllStudents()
   {
@@ -73,14 +71,22 @@ class StudentControllers extends Controller
     return response()->json($students, 200);
   }
 
+  //get all student  details
+  public function getStudentById(int $id)
+  {
+    $student = Student::find($id);
+    return response()->json($student, 200);
+  }
+
 
   //save student
   public function saveStudent(Request $request,)
   {
     $validator = Validator::make($request->all(), [
-      'setial_no' => 'required',
-      'medium' => 'required',
-      'age' => 'required',
+      'serialNo' => 'required',
+      'district' => 'required',
+      'language' => 'required',
+      'ageGroup' => 'required',
       'stream' => 'required',
     ]);
 
@@ -108,9 +114,10 @@ class StudentControllers extends Controller
       }
 
       $student = new Student();
-      $student->setial_no = $request->input('setial_no');
-      $student->medium = $request->input('medium');
-      $student->age = $request->input('age');
+      $student->setial_no = $request->input('serialNo');
+      $student->district = $request->input('district');
+      $student->medium = $request->input('language');
+      $student->age = $request->input('ageGroup');
       $student->stream = $request->input('stream');
       $student->image = $request->image;
       $student->student_detail = $request->student_detail;
