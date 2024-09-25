@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+
 
 class AdminControllers extends Controller
 {
@@ -101,11 +103,20 @@ class AdminControllers extends Controller
         $user = User::where('contact', 'LIKE', '%' . substr($contact, -9))
             ->first();
         if ($user) {
-            $twilio = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
-            $twilio->verify->v2->services(env('SERVICE_TOKEN'))
-                ->verifications
-                ->create($contact, "sms");
+            $url = 'https://app.text.lk/api/http/sms/send';
+            $response = Http::post($url, [
+                'api_token' => '62|u9MhYN6e0faDAOlFyWznAxII9cDFtbCNo65IEKvNdcd92f65',
+                'recipient' => '+94'.$contact,
+                'sender_id' => 'TEXTLK',
+                'type' => 'plain',
+                'message' => 'This is a test message 5054',
+            ]);
+
+            if ($response->successful()) {
             return response()->json(['message' => 'OTP sent successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Unsuccessfull..!'], 400);
+            }
         } else {
             return response()->json(['message' => 'Invalied User..!'], 430);
         }
