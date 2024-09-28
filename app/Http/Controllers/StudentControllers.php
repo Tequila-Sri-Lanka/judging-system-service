@@ -23,7 +23,7 @@ class StudentControllers extends Controller
     public function updateStudent(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'setial_no' => 'required',
+            'serial_no' => 'required',
             'medium' => 'required',
             'age' => 'required',
             'stream' => 'required',
@@ -98,7 +98,7 @@ class StudentControllers extends Controller
                 'errors' => $validator->errors(),
             ], 500);
         } else {
-            $student = Student::where('setial_no', $request->serialNo)->first();
+            $student = Student::where('serial_no', $request->serialNo)->first();
             if ($student != null) {
                 return response()->json([
                     'status' => 500,
@@ -122,7 +122,7 @@ class StudentControllers extends Controller
                 }
 
                 $student = new Student();
-                $student->setial_no = $request->input('serialNo');
+                $student->serial_no = $request->input('serialNo');
                 $student->district = $request->input('district');
                 $student->medium = $request->input('language');
                 $student->age = $request->input('ageGroup');

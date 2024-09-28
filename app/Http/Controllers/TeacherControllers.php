@@ -62,17 +62,24 @@ class TeacherControllers extends Controller
             'adminId' => 'required|int|max:191',
             'availableDistricts' => 'required|array|max:191',
             'userName' => 'required|string|max:191',
-            'contact' => 'required|int',
+            'contact' => 'required|unique:teachers,contact',
             'password' => 'required|string|max:191',
             'stream' => 'required|string|max:191',
         ]);
 
         if ($validator->fails()) {
+            if ($validator->errors()->has('contact')) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "The contact field validation failed: " . $validator->errors()->first('contact'),
+                ], 422);
+            }
+
             return response()->json([
                 'status' => 400,
                 'message' => "Validations faild",
                 'errors' => $validator->errors(),
-            ], 500);
+            ], 400);
         } else {
             // dd($request->all());
 

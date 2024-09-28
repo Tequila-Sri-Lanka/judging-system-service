@@ -13,13 +13,14 @@ class Student extends Model
 
     protected $fillable = [
         'student_id',
-        'setial_no',
+        'serial_no',
         'medium',
         'district',
         'age',
         'image',
         'student_detail',
         'stream',
+        'marking_status',
     ];
 
     public function Marks()
