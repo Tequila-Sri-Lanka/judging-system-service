@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->increments("student_id");
             $table->string("serial_no");
-            $table->string('medium');
+            $table->string('language')->nullable();
             $table->string("district");
             $table->string('age');
             $table->string('image')->nullable();

@@ -23,9 +23,10 @@ class StudentControllers extends Controller
     public function updateStudent(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'serial_no' => 'required',
-            'medium' => 'required',
-            'age' => 'required',
+            'serialNo' => 'required',
+            'language' => 'required',
+            'district' => 'required',
+            'ageGroup' => 'required',
             'stream' => 'required',
         ]);
         if ($validator->fails()) {
@@ -51,7 +52,11 @@ class StudentControllers extends Controller
             $studentDetailPath = $request->file('student_detail')->store('student_detail', 'public');
             $student->student_detail = $studentDetailPath;
         }
-        $student->fill($request->all());
+        // $student->fill($request->all());
+        $student->language = $request->language;
+        $student->age = $request->ageGroup;
+        $student->stream = $request->stream;
+        $student->district = $request->district;
         if ($student->save()) {
             return response()->json([
                 'status' => 200,
@@ -66,10 +71,26 @@ class StudentControllers extends Controller
     }
 
     //get all student  details
-    public function getAllStudents()
+    public function getAllStudents(Request $request)
     {
-        $students = Student::with(['marks'])->get();
-        return response()->json($students, 200);
+        // $students = Student::with(['marks'])->get();
+        // return response()->json($students, 200);
+
+        $query = Student::with('marks');
+
+    if ($request->has('districts') && count($request->districts) > 0) {
+        $query->where('district', 'in', $request->districts);
+    }
+    if ($request->has('stream')) {
+        $query->where('stream', $request->stream);
+    }
+    if ($request->has('language')) {
+        $query->where('language', $request->language);
+    }
+
+    $students = $query->get();
+
+    return response()->json($students, 200);
     }
 
     //get all student  details
@@ -124,7 +145,7 @@ class StudentControllers extends Controller
                 $student = new Student();
                 $student->serial_no = $request->input('serialNo');
                 $student->district = $request->input('district');
-                $student->medium = $request->input('language');
+                $student->language = $request->input('language');
                 $student->age = $request->input('ageGroup');
                 $student->stream = $request->input('stream');
                 $student->image = $request->image;
