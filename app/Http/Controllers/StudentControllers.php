@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Marks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -73,24 +74,24 @@ class StudentControllers extends Controller
     //get all student  details
     public function getAllStudents(Request $request)
     {
-        // $students = Student::with(['marks'])->get();
-        // return response()->json($students, 200);
-
         $query = Student::with('marks');
 
-    if ($request->has('districts') && count($request->districts) > 0) {
-        $query->where('district', 'in', $request->districts);
-    }
-    if ($request->has('stream')) {
+    // if ($request->has('districts') && count($request->districts) > 0) {
+    //     $query->where('district', 'in', $request->districts);
+    // }
+    if ($request->has('stream') && $request->has('language')) {
         $query->where('stream', $request->stream);
-    }
-    if ($request->has('language')) {
         $query->where('language', $request->language);
+
+        $students = $query->get();
+        $marks = Marks::where('teacher_id', $request->teacherId)->get();
+
+        return response()->json(['students' => $students, 'marks' => $marks],200);
+    } else {
+        $students = $query->get();
+        return response()->json($students, 200);
     }
 
-    $students = $query->get();
-
-    return response()->json($students, 200);
     }
 
     //get all student  details

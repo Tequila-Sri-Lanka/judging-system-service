@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('marks', function (Blueprint $table) {
             $table->increments("mark_id");
-            $table->string('mark');
+            $table->integer('mark_01');
+            $table->integer('mark_02');
+            $table->integer('mark_03');
+            $table->integer('mark_04');
+            $table->integer('mark_05');
             $table->double('total');
-            $table->double('averages');
             $table->unsignedInteger('teacher_id');
             $table->unsignedInteger('student_id');
             $table->timestamps();
