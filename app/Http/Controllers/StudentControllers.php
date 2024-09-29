@@ -76,23 +76,23 @@ class StudentControllers extends Controller
     {
         $query = Student::with('marks');
 
-    // if ($request->has('districts') && count($request->districts) > 0) {
-    //     $query->where('district', 'in', $request->districts);
-    // }
-    if ($request->has('stream') && $request->has('language')) {
-        $query->where('stream', $request->stream);
-        $query->where('language', $request->language);
+        if ($request->has('language')) {
+            $query->where('language', $request->language);
+        }
 
-        $students = $query->get();
-        $marks = Marks::where('teacher_id', $request->teacherId)->get();
+        if ($request->has('stream')) {
+            $query->where('stream', $request->stream);
+        }
+        if ($request->has('teacherId')) {
+            $query->whereHas('marks', function($q) use ($request) {
+                $q->where('teacherId', $request->teacherId);
+            });
+        }
 
-        return response()->json(['students' => $students, 'marks' => $marks],200);
-    } else {
         $students = $query->get();
         return response()->json($students, 200);
     }
 
-    }
 
     //get all student  details
     public function getStudentById(int $id)
@@ -103,7 +103,7 @@ class StudentControllers extends Controller
 
 
     //save student
-    public function saveStudent(Request $request,)
+    public function saveStudent(Request $request, )
     {
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
@@ -153,6 +153,7 @@ class StudentControllers extends Controller
                 $student->student_detail = $request->student_detail;
 
                 $isSave = $student->save();
+                
 
                 // Check if student save successfully or not and return appropriate response.
                 if ($isSave) {

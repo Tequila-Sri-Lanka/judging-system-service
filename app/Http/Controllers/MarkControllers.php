@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marks;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -91,6 +92,9 @@ class MarkControllers extends Controller
       $mark->teacher_id= $request->teacher_id;
       $mark->student_id= $request->student_id;
       $mark->save();
+      $student = Student::find($request->student_id);
+      $student->marking_status=($student->marking_status+1);
+      $student->save();
     }
     return response()->json([
       'status' => 200,
