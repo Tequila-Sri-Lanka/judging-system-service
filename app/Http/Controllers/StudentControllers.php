@@ -74,23 +74,25 @@ class StudentControllers extends Controller
     //get all student  details
     public function getAllStudents(Request $request)
     {
-        $query = Student::with('marks');
-
-        if ($request->has('language')) {
-            $query->where('language', $request->language);
-        }
-
-        if ($request->has('stream')) {
-            $query->where('stream', $request->stream);
-        }
-        if ($request->has('teacherId')) {
-            $query->whereHas('marks', function($q) use ($request) {
-                $q->where('teacherId', $request->teacherId);
-            });
-        }
-
-        $students = $query->get();
-        return response()->json($students, 200);
+            $query = Student::query();
+        
+            if ($request->has('language')) {
+                $query->where('language', $request->language);
+            }
+        
+            if ($request->has('stream')) {
+                $query->where('stream', $request->stream);
+            }
+        
+            if ($request->has('teacherId')) {
+                $query->with(['marks' => function($q) use ($request) {
+                    $q->where('teacher_id', $request->teacherId);
+                }]);
+            } else {
+                $query->with('marks');
+            }
+            $students = $query->get();
+            return response()->json($students, 200);
     }
 
 
@@ -153,7 +155,7 @@ class StudentControllers extends Controller
                 $student->student_detail = $request->student_detail;
 
                 $isSave = $student->save();
-                
+
 
                 // Check if student save successfully or not and return appropriate response.
                 if ($isSave) {
