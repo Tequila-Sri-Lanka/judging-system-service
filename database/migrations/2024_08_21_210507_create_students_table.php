@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->increments("student_id");
-            $table->string("setial_no");
-            $table->string('medium');
-            $table->integer('age');
+            $table->string("serial_no");
+            $table->string('language')->nullable();
+            $table->string("district");
+            $table->string('age');
             $table->string('image')->nullable();
             $table->string('student_detail')->nullable();
             $table->string('stream');
+            $table->integer('marking_status')->default(0);
             $table->timestamps();
         });
     }

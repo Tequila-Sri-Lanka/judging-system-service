@@ -15,7 +15,7 @@ return new class extends Migration
             $table->increments("teacher_id");
             $table->string("user_name");
             $table->string("password");
-            $table->string("language");
+            $table->string("language")->nullable();;
             $table->string('stream');
             $table->integer('contact');
             $table->timestamps();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marks;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,11 +21,13 @@ class MarkControllers extends Controller
   public function updateMark(Request $request, $id)
   {
     $validator = Validator::make($request->all(), [
-      'mark' => 'required|array|max:190',
-      'total' => 'required|string|max:190',
-      'average'=> 'required|string|max:190',
-      'teacher_id'=> 'required|string|max:190',
-      'student_id'=> 'required|string|max:190',
+      'mark_01' => 'required',
+      'mark_02' => 'required',
+      'mark_03' => 'required',
+      'mark_04' => 'required',
+      'total' => 'required',
+      'teacher_id'=> 'required',
+      'student_id'=> 'required',
     ]);
 
     if ($validator->fails()) {
@@ -35,9 +38,12 @@ class MarkControllers extends Controller
       ], 500);
     } else {
       $mark = Marks::find($id);
-      $mark->mark = $request->mark;
+      $mark->mark_01 = $request->mark_01;
+      $mark->mark_02 = $request->mark_02;
+      $mark->mark_03 = $request->mark_03;
+      $mark->mark_04 = $request->mark_04;
+      $mark->mark_05 = $request->mark_05;
       $mark->total= $request->total;
-      $mark->averages = $request->average;
       $mark->teacher_id= $request->teacher_id;
       $mark->student_id= $request->student_id;
       $result = $mark->save();
@@ -58,7 +64,11 @@ class MarkControllers extends Controller
   public function saveMark(Request $request)
   {
     $validator = Validator::make($request->all(), [
-        'mark' => 'required|string|max:190',
+        'mark_01' => 'required',
+        'mark_02' => 'required',
+        'mark_03' => 'required',
+        'mark_04' => 'required',
+        'total' => 'required',
         'teacher_id'=> 'required|int|max:190',
         'student_id'=> 'required|int|max:190',
     ]);
@@ -71,16 +81,22 @@ class MarkControllers extends Controller
       ], 500);
     } else {
       $mark = new Marks();
-      $mark->mark = $request->mark;
+      $mark->mark_01 = $request->mark_01;
+      $mark->mark_02 = $request->mark_02;
+      $mark->mark_03 = $request->mark_03;
+      $mark->mark_04 = $request->mark_04;
+      $mark->mark_05 = $request->mark_05;
       $mark->total= $request->total;
-      $mark->averages = $request->average;
       $mark->teacher_id= $request->teacher_id;
       $mark->student_id= $request->student_id;
       $mark->save();
+      $student = Student::find($request->student_id);
+      $student->marking_status=($student->marking_status+1);
+      $student->save();
     }
     return response()->json([
       'status' => 200,
-      'message' => "Teacher saved successfully",
+      'message' => "Marks saved successfully",
       'request_data' => $request->all(),
     ], 200);
   }

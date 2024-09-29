@@ -24,10 +24,11 @@ class TeacherControllers extends Controller
     public function updateTeacher(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'admin_id' => 'required|int|max:191',
-            'user_name' => 'required|string|max:191',
+            'adminId' => 'required|int|max:191',
+            'userName' => 'required|string|max:191',
+            'contact' => 'required',
+            'password' => 'required|string|max:191',
             'stream' => 'required|string|max:191',
-            'password' => 'required|string|max:191'
         ]);
 
         if ($validator->fails()) {
@@ -37,15 +38,46 @@ class TeacherControllers extends Controller
                 'errors' => $validator->errors(),
             ], 500);
         } else {
-            $teacher = Teacher::find($id);
-            $teacher->admin_id = $request->admin_id;
-            $teacher->user_name = $request->user_name;
-            $teacher->language = $request->language;
-            $teacher->stream = $request->stream;
-            $teacher->password = $request->password;
-            $result = $teacher->save();
+            if ($request->availableDistricts != null) {
+                $teacher = Teacher::find($id);
+                $teacher->admin_id = $request->adminId;
+                $teacher->user_name = $request->userName;
+                $teacher->password = bcrypt($request->password);
+                $teacher->stream = $request->stream;
+                $teacher->contact = $request->contact;
+                if (!is_null($request->language)) {
+                    $teacher->language = $request->language;
+                } else
+                    $teacher->language = '';
+                $result = $teacher->save();
+                DB::table('district_details')
+                    ->where('teacher_id', $id)
+                    ->delete();
+
+                foreach ($request->availableDistricts as $district) {
+                    $districtDetail = new District_detail();
+                    $districtDetail->teacher_id = $teacher->teacher_id;
+                    $districtDetail->district_id = $district;
+                    $districtDetail->save();
+                }
+                return response()->json($result, 201);
+
+            } else{
+                $teacher = Teacher::find($id);
+                $teacher->admin_id = $request->adminId;
+                $teacher->user_name = $request->userName;
+                $teacher->password = bcrypt($request->password);
+                $teacher->stream = $request->stream;
+                $teacher->contact = $request->contact;
+                if (!is_null($request->language)) {
+                    $teacher->language = $request->language;
+                } else
+                    $teacher->language = '';
+                $result = $teacher->save();
+                return response()->json($result, 201);
+            }
         }
-        return response()->json($result, 201);
+
     }
 
     //get all teacher  details
@@ -62,19 +94,25 @@ class TeacherControllers extends Controller
             'adminId' => 'required|int|max:191',
             'availableDistricts' => 'required|array|max:191',
             'userName' => 'required|string|max:191',
-            'contact' => 'required|int',
+            'contact' => 'required|unique:teachers,contact',
             'password' => 'required|string|max:191',
             'stream' => 'required|string|max:191',
         ]);
 
         if ($validator->fails()) {
+            if ($validator->errors()->has('contact')) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => "The contact field validation failed: " . $validator->errors()->first('contact'),
+                ], 422);
+            }
+
             return response()->json([
                 'status' => 400,
                 'message' => "Validations faild",
                 'errors' => $validator->errors(),
-            ], 500);
+            ], 400);
         } else {
-            // dd($request->all());
 
             $teacher = new Teacher();
             $teacher->admin_id = $request->adminId;
@@ -84,7 +122,8 @@ class TeacherControllers extends Controller
             $teacher->contact = $request->contact;
             if (!is_null($request->language)) {
                 $teacher->language = $request->language;
-            } else $teacher->language = '';
+            } else
+                $teacher->language = '';
             $teacher->save();
 
             foreach ($request->availableDistricts as $value) {
