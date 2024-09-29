@@ -95,6 +95,11 @@ class StudentControllers extends Controller
             return response()->json($students, 200);
     }
 
+    public function getAllStudentsWithMark()
+    {
+            $query = Student::with('marks')->get();;
+            return response()->json($query, 200);
+    }
 
     //get all student  details
     public function getStudentById(int $id)
