@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('mark_02');
             $table->integer('mark_03');
             $table->integer('mark_04');
-            $table->integer('mark_05');
+            $table->integer('mark_05')->nullable();
             $table->double('total');
             $table->unsignedInteger('teacher_id');
             $table->unsignedInteger('student_id');
