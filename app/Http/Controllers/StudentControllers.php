@@ -75,24 +75,25 @@ class StudentControllers extends Controller
     {
             $query = Student::query();
 
-            $query->where('marking_status', '<', 3);
-
             if ($request->has('language')) {
                 $query->where('language', $request->language);
             }
             if ($request->has('stream')) {
                 $query->where('stream', $request->stream);
             }
-            if ($request->has('teacherId')) {
-                $query->with(['marks' => function($q) use ($request) {
-                    $q->where('teacher_id', $request->teacherId);
-                }]);
-            } else {
-                $query->with('marks');
+            if($request->has('district')){
+                $query->where('district', $request->district);
             }
+
+            $mark=Marks::find($request->teacherId);
+            if ($mark!=null) {
+                $query->where('marking_status', '<', 3);
+            }
+
             $students = $query->get();
             return response()->json($students, 200);
     }
+    
 
     public function getAllStudentsWithMark()
     {
