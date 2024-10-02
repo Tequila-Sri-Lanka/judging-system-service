@@ -25,7 +25,6 @@ class StudentControllers extends Controller
     {
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
-            'language' => 'required',
             'district' => 'required',
             'ageGroup' => 'required',
             'stream' => 'required',
@@ -75,15 +74,15 @@ class StudentControllers extends Controller
     public function getAllStudents(Request $request)
     {
             $query = Student::query();
-        
+
+            $query->where('marking_status', '<', 3);
+
             if ($request->has('language')) {
                 $query->where('language', $request->language);
             }
-        
             if ($request->has('stream')) {
                 $query->where('stream', $request->stream);
             }
-        
             if ($request->has('teacherId')) {
                 $query->with(['marks' => function($q) use ($request) {
                     $q->where('teacher_id', $request->teacherId);
@@ -115,7 +114,6 @@ class StudentControllers extends Controller
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
             'district' => 'required',
-            'language' => 'required',
             'ageGroup' => 'required',
             'stream' => 'required',
         ]);
