@@ -156,13 +156,18 @@ class TeacherControllers extends Controller
             'password' => 'required'
         ]);
 
-        $user = Teacher::where('user_name', $fields['userName'])->first();
+        $user = Teacher::where('user_name', $fields['userName'])
+        ->with(['districtDetails.Districts'])
+        ->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credentials'], 401);
         }
 
         $token = $user->createToken('token')->plainTextToken;
-        return response(['user' => $user, 'token' => $token], 200);
+        return response([
+            'user' => $user,
+            'token' => $token
+        ], 200);
     }
 }
