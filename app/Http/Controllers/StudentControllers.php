@@ -86,7 +86,6 @@ class StudentControllers extends Controller
         if ($request->has('stream')) {
             $query->where('stream', $request->stream);
         }
-    
 
         $students = $query->with('marks')->get();
         return response()->json($students, 200);
@@ -105,7 +104,6 @@ class StudentControllers extends Controller
         $student = Student::find($id);
         return response()->json($student, 200);
     }
-
 
     //save student
     public function saveStudent(Request $request)
