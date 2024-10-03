@@ -59,8 +59,7 @@ class TeacherControllers extends Controller
                     $districtDetail->save();
                 }
                 return response()->json($result, 201);
-
-            } else{
+            } else {
                 $teacher = Teacher::find($id);
                 $teacher->admin_id = $request->adminId;
                 $teacher->user_name = $request->userName;
@@ -75,7 +74,6 @@ class TeacherControllers extends Controller
                 return response()->json($result, 201);
             }
         }
-
     }
 
     //get all teacher  details
@@ -157,8 +155,10 @@ class TeacherControllers extends Controller
         ]);
 
         $user = Teacher::where('user_name', $fields['userName'])
-        ->with(['districtDetails.Districts'])
-        ->first();
+            ->with(['districtDetails' => function ($query) {
+                $query->select('district_id', 'teacher_id');
+            }])
+            ->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credentials'], 401);

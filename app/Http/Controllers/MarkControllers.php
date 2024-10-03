@@ -70,7 +70,7 @@ class MarkControllers extends Controller
         'mark_04' => 'required',
         'total' => 'required',
         'teacher_id'=> 'required|int|max:190',
-        'student_id'=> 'required|int|max:190',
+        'student_id'=> 'required|int',
     ]);
 
     if ($validator->fails()) {
