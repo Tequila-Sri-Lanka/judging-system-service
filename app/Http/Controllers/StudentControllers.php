@@ -55,6 +55,8 @@ class StudentControllers extends Controller
         $student->language = $request->language;
         $student->age = $request->ageGroup;
         $student->stream = $request->stream;
+        $student->school=$request->school;
+        $student->studentName=$request->studentName;
         $student->district = $request->district;
         if ($student->save()) {
             return response()->json([
@@ -84,12 +86,7 @@ class StudentControllers extends Controller
         if ($request->has('stream')) {
             $query->where('stream', $request->stream);
         }
-       
-
-        $mark = Marks::find($request->teacherId);
-        if ($mark != null) {
-            $query->where('marking_status', '<', 3);
-        }
+    
 
         $students = $query->with('marks')->get();
         return response()->json($students, 200);
