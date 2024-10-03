@@ -74,22 +74,24 @@ class StudentControllers extends Controller
     {
         $query = Student::query();
 
+        if ($request->has('district') && is_array($request->district)) {
+            $query->whereIn('district', $request->district);
+        }
+
         if ($request->has('language')) {
             $query->where('language', $request->language);
         }
         if ($request->has('stream')) {
             $query->where('stream', $request->stream);
         }
-        if ($request->has('district')) {
-            $query->where('district', $request->district);
-        }
+       
 
         $mark = Marks::find($request->teacherId);
         if ($mark != null) {
             $query->where('marking_status', '<', 3);
         }
 
-        $students = $query->get();
+        $students = $query->with('marks')->get();
         return response()->json($students, 200);
     }
 
@@ -154,6 +156,8 @@ class StudentControllers extends Controller
                 $student->language = $request->input('language');
                 $student->age = $request->input('ageGroup');
                 $student->stream = $request->input('stream');
+                $student->school=$request->school;
+                $student->studentName=$request->studentName;
                 $student->image = $request->image;
                 $student->student_detail = $request->student_detail;
 
