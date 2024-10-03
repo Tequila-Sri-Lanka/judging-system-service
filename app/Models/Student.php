@@ -20,6 +20,8 @@ class Student extends Model
         'image',
         'student_detail',
         'stream',
+        'school',
+        'studentName',
         'marking_status',
     ];
 

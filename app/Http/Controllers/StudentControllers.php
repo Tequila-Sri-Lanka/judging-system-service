@@ -7,7 +7,9 @@ use App\Models\Marks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use function Laravel\Prompts\search;
+use Illuminate\Support\Facades\Log;
 
 class StudentControllers extends Controller
 {
@@ -73,32 +75,32 @@ class StudentControllers extends Controller
     //get all student  details
     public function getAllStudents(Request $request)
     {
-            $query = Student::query();
+        $query = Student::query();
 
-            if ($request->has('language')) {
-                $query->where('language', $request->language);
-            }
-            if ($request->has('stream')) {
-                $query->where('stream', $request->stream);
-            }
-            if($request->has('district')){
-                $query->where('district', $request->district);
-            }
+        if ($request->has('language')) {
+            $query->where('language', $request->language);
+        }
+        if ($request->has('stream')) {
+            $query->where('stream', $request->stream);
+        }
+        if ($request->has('district')) {
+            $query->where('district', $request->district);
+        }
 
-            $mark=Marks::find($request->teacherId);
-            if ($mark!=null) {
-                $query->where('marking_status', '<', 3);
-            }
+        $mark = Marks::find($request->teacherId);
+        if ($mark != null) {
+            $query->where('marking_status', '<', 3);
+        }
 
-            $students = $query->get();
-            return response()->json($students, 200);
+        $students = $query->get();
+        return response()->json($students, 200);
     }
-    
+
 
     public function getAllStudentsWithMark()
     {
-            $query = Student::with('marks')->get();;
-            return response()->json($query, 200);
+        $query = Student::with('marks')->get();;
+        return response()->json($query, 200);
     }
 
     //get all student  details
@@ -110,7 +112,7 @@ class StudentControllers extends Controller
 
 
     //save student
-    public function saveStudent(Request $request, )
+    public function saveStudent(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
@@ -176,5 +178,144 @@ class StudentControllers extends Controller
                 }
             }
         }
+    }
+
+    public function uploadExcel(Request $request)
+    {
+        $districtList = [
+            'Colombo' => 1,
+            'Galle' => 2,
+            'Gampaha' => 3,
+            'Kalutara' => 4,
+            'Kandy' => 5,
+            'Matale' => 6,
+            'Nuwara Eliya' => 7,
+            'Kegalle' => 8,
+            'Hambantota' => 9,
+            'Matara' => 10,
+            'Jaffna' => 11,
+            'Kilinochchi' => 12,
+            'Mannar' => 13,
+            'Mullaitivu' => 14,
+            'Vavuniya' => 15,
+            'Ampara' => 16,
+            'Batticaloa' => 17,
+            'Trincomalee' => 18,
+            'Anuradhapura' => 19,
+            'Polonnaruwa' => 20,
+            'Kurunegala' => 21,
+            'Puttalam' => 22,
+            'Badulla' => 23,
+            'Monaragala' => 24,
+            'Ratnapura' => 25
+        ];
+
+        // Validate the file input
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        // Store the uploaded file temporarily
+        $file = $request->file('excel_file');
+        $filePath = $file->getRealPath();
+
+        // Load the Excel file
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getSheetByName('Sinhala');
+
+        // Iterate through rows in the sheet
+        foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [];
+            foreach ($cellIterator as $cell) {
+                $rowData[] = $cell->getValue();
+            }
+            // Skip the header row
+            if ($rowIndex == 1) {
+                continue;
+            }
+
+            $districtName = $rowData[3];
+            $districtId = $districtList[$districtName] ?? 0;
+
+            if ($districtId === null) {
+                Log::error("District not found for district: " . $districtName);
+                continue;
+            }
+
+            $defaultValue = '000000000000'; // Default for string fields
+            $serialNo = !empty($rowData[1]) ? $rowData[1] : $defaultValue; // Serial Number
+            $district = $districtId; // District
+            $ageGroup = !empty($rowData[7]) ? $rowData[7] : $defaultValue;; // age
+            $school = !empty($rowData[6]) ? $rowData[6] : $defaultValue; // School
+            $studentName = !empty($rowData[9]) ? $rowData[9] : $defaultValue; // Student Name
+            $stream = !empty($rowData[8]) ? $rowData[8] : $defaultValue; // Competition (stream)
+            $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
+
+            if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
+                Log::alert('Missing required fields  - ' . $rowIndex . ' - ' . json_encode($rowData) . '\n');
+            }
+            Student::create([
+                'serial_no' => $serialNo,
+                'district' => $districtId,
+                'school' => $school,
+                'age' => $ageGroup,
+                'studentName' => $studentName,
+                'stream' => $stream,
+                'language' => $language,
+                'marking_status' => 0, // Default value
+            ]);
+        }
+
+        $sheet = $spreadsheet->getSheetByName('Tamil');
+
+        foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [];
+            foreach ($cellIterator as $cell) {
+                $rowData[] = $cell->getValue();
+            }
+            // Skip the header row
+            if ($rowIndex == 1) {
+                continue;
+            }
+
+            $districtName = $rowData[3];
+            $districtId = $districtList[$districtName] ?? 0;
+            if ($districtId === null) {
+                Log::error("District not found for district: " . $districtName);
+                continue;
+            }
+
+            $defaultValue = '000000000000'; // Default for string fields
+            $serialNo = !empty($rowData[1]) ? $rowData[1] : $defaultValue; // Serial Number
+            $district = $districtId; // District
+            $ageGroup = !empty($rowData[7]) ? $rowData[7] : $defaultValue;; // age
+            $school = !empty($rowData[6]) ? $rowData[6] : $defaultValue; // School
+            $studentName = !empty($rowData[9]) ? $rowData[9] : $defaultValue; // Student Name
+            $stream = !empty($rowData[8]) ? $rowData[8] : $defaultValue; // Competition (stream)
+            $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
+
+            if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
+                Log::alert('Missing required fields ' . $rowIndex . ' - ' . json_encode($rowData) . '\n');
+            }
+
+            Student::create([
+                'serial_no' => $serialNo,
+                'district' => $district,
+                'school' => $school,
+                'age' => $ageGroup,
+                'studentName' => $studentName,
+                'stream' => $stream,
+                'language' => $language,
+                'marking_status' => 0, // Default value
+            ]);
+        }
+
+        return response()->json(['message' => 'File processed successfully'], 201);
     }
 }
