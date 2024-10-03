@@ -27,7 +27,6 @@ class TeacherControllers extends Controller
             'adminId' => 'required|int|max:191',
             'userName' => 'required|string|max:191',
             'contact' => 'required',
-            'password' => 'required|string|max:191',
             'stream' => 'required|string|max:191',
         ]);
 
@@ -42,13 +41,12 @@ class TeacherControllers extends Controller
                 $teacher = Teacher::find($id);
                 $teacher->admin_id = $request->adminId;
                 $teacher->user_name = $request->userName;
-                $teacher->password = bcrypt($request->password);
                 $teacher->stream = $request->stream;
                 $teacher->contact = $request->contact;
                 if (!is_null($request->language)) {
                     $teacher->language = $request->language;
                 } else
-                    $teacher->language = '';
+                    $teacher->language = null;
                 $result = $teacher->save();
                 DB::table('district_details')
                     ->where('teacher_id', $id)
@@ -123,7 +121,7 @@ class TeacherControllers extends Controller
             if (!is_null($request->language)) {
                 $teacher->language = $request->language;
             } else
-                $teacher->language = '';
+                $teacher->language = null;
             $teacher->save();
 
             foreach ($request->availableDistricts as $value) {
@@ -158,13 +156,18 @@ class TeacherControllers extends Controller
             'password' => 'required'
         ]);
 
-        $user = Teacher::where('user_name', $fields['userName'])->first();
+        $user = Teacher::where('user_name', $fields['userName'])
+        ->with(['districtDetails.Districts'])
+        ->first();
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credentials'], 401);
         }
 
         $token = $user->createToken('token')->plainTextToken;
-        return response(['user' => $user, 'token' => $token], 200);
+        return response([
+            'user' => $user,
+            'token' => $token
+        ], 200);
     }
 }

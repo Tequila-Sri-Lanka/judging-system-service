@@ -6,8 +6,7 @@ use App\Models\Student;
 use App\Models\Marks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use function Laravel\Prompts\search;
+
 
 class StudentControllers extends Controller
 {
@@ -25,7 +24,6 @@ class StudentControllers extends Controller
     {
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
-            'language' => 'required',
             'district' => 'required',
             'ageGroup' => 'required',
             'stream' => 'required',
@@ -74,31 +72,32 @@ class StudentControllers extends Controller
     //get all student  details
     public function getAllStudents(Request $request)
     {
-            $query = Student::query();
-        
-            if ($request->has('language')) {
-                $query->where('language', $request->language);
-            }
-        
-            if ($request->has('stream')) {
-                $query->where('stream', $request->stream);
-            }
-        
-            if ($request->has('teacherId')) {
-                $query->with(['marks' => function($q) use ($request) {
-                    $q->where('teacher_id', $request->teacherId);
-                }]);
-            } else {
-                $query->with('marks');
-            }
-            $students = $query->get();
-            return response()->json($students, 200);
+        $query = Student::query();
+
+        if ($request->has('language')) {
+            $query->where('language', $request->language);
+        }
+        if ($request->has('stream')) {
+            $query->where('stream', $request->stream);
+        }
+        if ($request->has('district')) {
+            $query->where('district', $request->district);
+        }
+
+        $mark = Marks::find($request->teacherId);
+        if ($mark != null) {
+            $query->where('marking_status', '<', 3);
+        }
+
+        $students = $query->get();
+        return response()->json($students, 200);
     }
+
 
     public function getAllStudentsWithMark()
     {
-            $query = Student::with('marks')->get();;
-            return response()->json($query, 200);
+        $query = Student::with('marks')->get();;
+        return response()->json($query, 200);
     }
 
     //get all student  details
@@ -110,12 +109,11 @@ class StudentControllers extends Controller
 
 
     //save student
-    public function saveStudent(Request $request, )
+    public function saveStudent(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'serialNo' => 'required',
             'district' => 'required',
-            'language' => 'required',
             'ageGroup' => 'required',
             'stream' => 'required',
         ]);

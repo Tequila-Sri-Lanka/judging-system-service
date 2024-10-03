@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\DistrictControllers;
 use App\Http\Controllers\DistrictDetailControllers;
+use App\Http\Controllers\ExcelReadController;
 use App\Http\Controllers\MarkControllers;
 use App\Http\Controllers\StudentControllers;
 use App\Http\Controllers\TeacherControllers;
@@ -60,6 +61,7 @@ Route::get('/get_all_student_with_mark', [StudentControllers::class, 'getAllStud
 Route::get('/student/{id}', [StudentControllers::class, 'getStudentById']);
 Route::delete('/delete_student/{id}', [StudentControllers::class, 'deleteStudent'])->name('deleteStudent');
 Route::post('/update_student/{id}', [StudentControllers::class, 'updateStudent'])->name('updateStudent');
+Route::post('/upload-excel', [ExcelReadController::class, 'uploadExcel']);
 
 //Mark api
 Route::post('/save_mark', [MarkControllers::class, 'saveMark'])->name('saveMark');
