@@ -14,7 +14,7 @@ class ExcelReadController extends Controller
             'Colombo' => 1,
             'Galle' => 2,
             'Gampaha' => 3,
-            'Kalutara' => 4,
+            'Kaluthara' => 4,
             'Kandy' => 5,
             'Matale' => 6,
             'Nuwara Eliya' => 7,
@@ -35,7 +35,7 @@ class ExcelReadController extends Controller
             'Puttalam' => 22,
             'Badulla' => 23,
             'Monaragala' => 24,
-            'Ratnapura' => 25
+            'Rathnapura' => 25
         ];
 
         // Validate the file input
@@ -65,10 +65,10 @@ class ExcelReadController extends Controller
                 continue;
             }
 
-            $districtName = $rowData[3];
+            $districtName = trim($rowData[3]);
             $districtId = $districtList[$districtName] ?? 0;
 
-            if ($districtId === null) {
+            if ($districtId === 0) {
                 Log::error("District not found for district: " . $districtName);
                 continue;
             }
@@ -83,7 +83,8 @@ class ExcelReadController extends Controller
             $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
 
             if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
-                Log::alert('Missing required fields  - ' . $rowIndex . ' - ' . json_encode($rowData) . '\n');
+                Log::alert('Missing required fields  - ' . $rowIndex . ' - ' . $rowData[1].' - '. $rowData[3].' - '. $rowData[6].' - '. $rowData[7].' - '. $rowData[9].' - '. $rowData[8].' - '. $rowData[11]. '\n');
+                continue;
             }
             Student::create([
                 'serial_no' => $serialNo,
@@ -92,7 +93,7 @@ class ExcelReadController extends Controller
                 'age' => $ageGroup,
                 'studentName' => $studentName,
                 'stream' => $stream,
-                'language' => $language,
+                'language' => $stream === 'Art' ? NULL : $language,
                 'marking_status' => 0, // Default value
             ]);
         }
@@ -112,9 +113,9 @@ class ExcelReadController extends Controller
                 continue;
             }
 
-            $districtName = $rowData[3];
+            $districtName = trim($rowData[3]);
             $districtId = $districtList[$districtName] ?? 0;
-            if ($districtId === null) {
+            if ($districtId === 0) {
                 Log::error("District not found for district: " . $districtName);
                 continue;
             }
@@ -129,7 +130,8 @@ class ExcelReadController extends Controller
             $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
 
             if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
-                Log::alert('Missing required fields ' . $rowIndex . ' - ' . json_encode($rowData) . '\n');
+                Log::alert('Missing required fields ' . $rowIndex . ' - ' . $rowData[1].' - '. $rowData[3].' - '. $rowData[6].' - '. $rowData[7].' - '. $rowData[9].' - '. $rowData[8].' - '. $rowData[11]. '\n');
+                continue;
             }
 
             Student::create([
@@ -139,7 +141,7 @@ class ExcelReadController extends Controller
                 'age' => $ageGroup,
                 'studentName' => $studentName,
                 'stream' => $stream,
-                'language' => $language,
+                'language' => $stream === 'Art' ? NULL : $language,
                 'marking_status' => 0, // Default value
             ]);
         }
