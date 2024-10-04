@@ -49,10 +49,12 @@ class ExcelReadController extends Controller
 
         // Load the Excel file
         $spreadsheet = IOFactory::load($filePath);
-        $sheet = $spreadsheet->getSheetByName('Sinhala');
+        $sheet = $spreadsheet->getSheetByName('allData');
 
         // Iterate through rows in the sheet
         foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+            Log::info("index id_______allData________", $rowIndex);
+
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
@@ -98,53 +100,54 @@ class ExcelReadController extends Controller
             ]);
         }
 
-        $sheet = $spreadsheet->getSheetByName('Tamil');
+        // $sheet = $spreadsheet->getSheetByName('Tamil');
 
-        foreach ($sheet->getRowIterator() as $rowIndex => $row) {
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
+        // foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+        //     Log::info("index id______tamil_________", $rowIndex);
+        //     $cellIterator = $row->getCellIterator();
+        //     $cellIterator->setIterateOnlyExistingCells(false);
 
-            $rowData = [];
-            foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getValue();
-            }
-            // Skip the header row
-            if ($rowIndex == 1) {
-                continue;
-            }
+        //     $rowData = [];
+        //     foreach ($cellIterator as $cell) {
+        //         $rowData[] = $cell->getValue();
+        //     }
+        //     // Skip the header row
+        //     if ($rowIndex == 1) {
+        //         continue;
+        //     }
 
-            $districtName = trim($rowData[3]);
-            $districtId = $districtList[$districtName] ?? 0;
-            if ($districtId === 0) {
-                Log::error("District not found for district: " . $districtName);
-                continue;
-            }
+        //     $districtName = trim($rowData[3]);
+        //     $districtId = $districtList[$districtName] ?? 0;
+        //     if ($districtId === 0) {
+        //         Log::error("District not found for district: " . $districtName);
+        //         continue;
+        //     }
 
-            $defaultValue = '000000000000'; // Default for string fields
-            $serialNo = !empty($rowData[1]) ? $rowData[1] : $defaultValue; // Serial Number
-            $district = $districtId; // District
-            $ageGroup = !empty($rowData[7]) ? $rowData[7] : $defaultValue;; // age
-            $school = !empty($rowData[6]) ? $rowData[6] : $defaultValue; // School
-            $studentName = !empty($rowData[9]) ? $rowData[9] : $defaultValue; // Student Name
-            $stream = !empty($rowData[8]) ? $rowData[8] : $defaultValue; // Competition (stream)
-            $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
+        //     $defaultValue = '000000000000'; // Default for string fields
+        //     $serialNo = !empty($rowData[1]) ? $rowData[1] : $defaultValue; // Serial Number
+        //     $district = $districtId; // District
+        //     $ageGroup = !empty($rowData[7]) ? $rowData[7] : $defaultValue;; // age
+        //     $school = !empty($rowData[6]) ? $rowData[6] : $defaultValue; // School
+        //     $studentName = !empty($rowData[9]) ? $rowData[9] : $defaultValue; // Student Name
+        //     $stream = !empty($rowData[8]) ? $rowData[8] : $defaultValue; // Competition (stream)
+        //     $language = !empty($rowData[11]) ? $rowData[11] : $defaultValue;
 
-            if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
-                Log::alert('Missing required fields ' . $rowIndex . ' - ' . $rowData[1].' - '. $rowData[3].' - '. $rowData[6].' - '. $rowData[7].' - '. $rowData[9].' - '. $rowData[8].' - '. $rowData[11]. '\n');
-                continue;
-            }
+        //     if (empty($rowData[1]) || empty($rowData[3]) || empty($rowData[6]) || empty($rowData[7]) || empty($rowData[9]) || empty($rowData[8]) || empty($rowData[11])) {
+        //         Log::alert('Missing required fields ' . $rowIndex . ' - ' . $rowData[1].' - '. $rowData[3].' - '. $rowData[6].' - '. $rowData[7].' - '. $rowData[9].' - '. $rowData[8].' - '. $rowData[11]. '\n');
+        //         continue;
+        //     }
 
-            Student::create([
-                'serial_no' => $serialNo,
-                'district' => $district,
-                'school' => $school,
-                'age' => $ageGroup,
-                'studentName' => $studentName,
-                'stream' => $stream,
-                'language' => $stream === 'Art' ? NULL : $language,
-                'marking_status' => 0, // Default value
-            ]);
-        }
+        //     Student::create([
+        //         'serial_no' => $serialNo,
+        //         'district' => $district,
+        //         'school' => $school,
+        //         'age' => $ageGroup,
+        //         'studentName' => $studentName,
+        //         'stream' => $stream,
+        //         'language' => $stream === 'Art' ? NULL : $language,
+        //         'marking_status' => 0, // Default value
+        //     ]);
+        // }
 
         return response()->json(['message' => 'File processed successfully'], 201);
     }
