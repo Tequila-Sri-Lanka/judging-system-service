@@ -65,7 +65,7 @@ class ExcelReadController extends Controller
                 continue;
             }
 
-            $districtName = $rowData[3];
+            $districtName = trim($rowData[3]);
             $districtId = $districtList[$districtName] ?? 0;
 
             if ($districtId === 0) {
@@ -93,7 +93,7 @@ class ExcelReadController extends Controller
                 'age' => $ageGroup,
                 'studentName' => $studentName,
                 'stream' => $stream,
-                'language' => $language,
+                'language' => $stream === 'Art' ? NULL : $language,
                 'marking_status' => 0, // Default value
             ]);
         }
@@ -113,7 +113,7 @@ class ExcelReadController extends Controller
                 continue;
             }
 
-            $districtName = $rowData[3];
+            $districtName = trim($rowData[3]);
             $districtId = $districtList[$districtName] ?? 0;
             if ($districtId === 0) {
                 Log::error("District not found for district: " . $districtName);
@@ -141,7 +141,7 @@ class ExcelReadController extends Controller
                 'age' => $ageGroup,
                 'studentName' => $studentName,
                 'stream' => $stream,
-                'language' => $language,
+                'language' => $stream === 'Art' ? NULL : $language,
                 'marking_status' => 0, // Default value
             ]);
         }
