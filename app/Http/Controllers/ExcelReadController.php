@@ -53,6 +53,8 @@ class ExcelReadController extends Controller
 
         // Iterate through rows in the sheet
         foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+            Log::info("index id_______sinhala________", $rowIndex);
+
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
@@ -101,6 +103,7 @@ class ExcelReadController extends Controller
         $sheet = $spreadsheet->getSheetByName('Tamil');
 
         foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+            Log::info("index id______tamil_________", $rowIndex);
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
