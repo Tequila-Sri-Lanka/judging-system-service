@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("password");
             $table->string("language")->nullable();;
             $table->string('stream');
-            $table->integer('contact');
+            $table->integer('contact')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('admin_id');
             $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');

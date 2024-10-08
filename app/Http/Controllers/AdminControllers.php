@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
 
 class AdminControllers extends Controller
 {
@@ -95,34 +95,39 @@ class AdminControllers extends Controller
         return response()->json($users, 200);
     }
 
-
     // Send OTP function
     public function sendOTP(Request $request)
     {
-        $request->validate(['contact' => 'required']);
+        $request->validate(['contact' => 'required', 'userName' => 'required']);
         $contact = $request->contact;
-        $user = Teacher::where('contact', 'LIKE', '%' . substr($contact, -9))
-            ->first();
+        $userName = $request->userName;
+
+        $user = Teacher::where('user_name', 'LIKE', '%' . $userName)->first();
+
         if ($user) {
-            $otp = $this->generateOTP();
-            $url = 'https://app.text.lk/api/http/sms/send';
-            $response = Http::post($url, [
-                'api_token' => '62|u9MhYN6e0faDAOlFyWznAxII9cDFtbCNo65IEKvNdcd92f65',
-                'recipient' => '+94' . $contact,
+            $queryParams = http_build_query([
+                'recipient' => '94' . $contact,
                 'sender_id' => 'TEXTLK',
-                'type' => 'plain',
-                'message' => 'Use this as the OTP Code ' . $otp,
+                'type' => 'otp',
+                'message' => 'Use this as the OTP Code is: {{OTP4}}',
             ]);
+
+            $url = 'https://app.text.lk/api/v3/sms/send?'.$queryParams;
+
+            $response = Http::withToken('62|u9MhYN6e0faDAOlFyWznAxII9cDFtbCNo65IEKvNdcd92f65')
+            ->post($url);
 
             if ($response->successful()) {
                 Otp::create([
                     'contact' => $contact,
-                    'otp' => $otp,
+                    'otp' => $response['data']['otp'],
                     'expires_at' => now()->addMinutes(2)
                 ]);
-                return response()->json(['message' => 'OTP sent successfully'], 200);
+                return response()->json(['message' => 'OTP successfully sent!'], 200);
             } else {
-                return response()->json(['message' => 'Unsuccessfull..!'], 400);
+                return response()->json(['message' => 'Invalid OTP'], 400);
+                Log::info($response->body());
+                Log::info($response->status());
             }
         } else {
             return response()->json(['message' => 'Invalied User..!'], 430);
@@ -151,16 +156,19 @@ class AdminControllers extends Controller
     public function changePassword(Request $request)
     {
         $request->validate([
-            'contact' => 'required|exists:teachers,contact',
+            'contact' => 'required',
+            'userName' => 'required|exists:teachers,user_name',
             'password' => 'required|min:4|string',
         ]);
+        $userName = $request->userName;
         $contact = $request->contact;
         $password = $request->password;
 
-        $user = Teacher::where('contact', $contact)->first();
+        $user = Teacher::where('user_name', $userName)->first();
         if ($user) {
             $user->update([
                 'password' => Hash::make($password),
+                'contact' => $contact,
             ]);
             return response()->json(['message' => 'Password changed successfully'], 200);
         } else {

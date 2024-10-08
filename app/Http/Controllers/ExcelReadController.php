@@ -49,12 +49,10 @@ class ExcelReadController extends Controller
 
         // Load the Excel file
         $spreadsheet = IOFactory::load($filePath);
-        $sheet = $spreadsheet->getSheetByName('allData');
+        $sheet = $spreadsheet->getSheetByName('data');
 
         // Iterate through rows in the sheet
         foreach ($sheet->getRowIterator() as $rowIndex => $row) {
-            Log::info("index id_______allData________", $rowIndex);
-
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
