@@ -26,8 +26,8 @@ class TeacherControllers extends Controller
         $validator = Validator::make($request->all(), [
             'adminId' => 'required|int|max:191',
             'userName' => 'required|string|max:191',
-            'contact' => 'required',
             'stream' => 'required|string|max:191',
+            'availableDistricts' => 'required|array',
         ]);
 
         if ($validator->fails()) {
@@ -42,7 +42,7 @@ class TeacherControllers extends Controller
                 $teacher->admin_id = $request->adminId;
                 $teacher->user_name = $request->userName;
                 $teacher->stream = $request->stream;
-                $teacher->contact = $request->contact;
+                $teacher->contact = $request->contact ?? NULL;
                 if (!is_null($request->language)) {
                     $teacher->language = $request->language;
                 } else
@@ -90,7 +90,6 @@ class TeacherControllers extends Controller
             'adminId' => 'required|int|max:191',
             'availableDistricts' => 'required|array|max:191',
             'userName' => 'required|string|max:191',
-            'contact' => 'required|unique:teachers,contact',
             'password' => 'required|string|max:191',
             'stream' => 'required|string|max:191',
         ]);
@@ -115,7 +114,6 @@ class TeacherControllers extends Controller
             $teacher->user_name = $request->userName;
             $teacher->password = bcrypt($request->password);
             $teacher->stream = $request->stream;
-            $teacher->contact = $request->contact;
             if (!is_null($request->language)) {
                 $teacher->language = $request->language;
             } else
