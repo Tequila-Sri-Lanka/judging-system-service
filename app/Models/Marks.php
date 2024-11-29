@@ -29,6 +29,6 @@ class Marks extends Model
 
     public function students()
     {
-        return $this->belongsTo(Teacher::class, 'student_id');
+        return $this->belongsTo(Student::class, 'student_id');
     }
 }

@@ -145,6 +145,18 @@ class TeacherControllers extends Controller
         return response()->json($teachers, 201);
     }
 
+
+     //get student by teacher id
+     public function searchStudentTeacherWise($input)
+     {
+         $teachers = Teacher::with(['Marks.students', 'Marks'])
+             ->where('teacher_id', 'LIKE', '%' . $input . '%')
+             ->get();
+         return response()->json($teachers, 201);
+     }
+
+     
+
     public function login(Request $request)
     {
         $fields = $request->validate([
