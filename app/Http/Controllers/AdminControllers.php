@@ -107,7 +107,7 @@ class AdminControllers extends Controller
         if ($user) {
             $queryParams = http_build_query([
                 'recipient' => '94' . $contact,
-                'sender_id' => 'TEXTLK',
+                'sender_id' => 'TextLKDemo',
                 'type' => 'otp',
                 'message' => 'Use this as the OTP Code is: {{OTP4}}',
             ]);
@@ -116,6 +116,10 @@ class AdminControllers extends Controller
 
             $response = Http::withToken('62|u9MhYN6e0faDAOlFyWznAxII9cDFtbCNo65IEKvNdcd92f65')
             ->post($url);
+            Log::info($response->status());
+            Log::info('asjsajdsj');
+
+            Log::info($response->body());
 
             if ($response->successful()) {
                 Otp::create([
