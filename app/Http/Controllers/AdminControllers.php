@@ -114,7 +114,7 @@ class AdminControllers extends Controller
 
             $url = 'https://app.text.lk/api/v3/sms/send?'.$queryParams;
 
-            $response = Http::withToken('125|CADgBJ21Ulk4spPONK1dRzGyi3CCv7CUHg94sH5v1e71ba87 ')
+            $response = Http::withToken('62|u9MhYN6e0faDAOlFyWznAxII9cDFtbCNo65IEKvNdcd92f65 ')
             ->post($url);
             Log::info($response->status());
             Log::info('asjsajdsj');
